@@ -1,40 +1,48 @@
 package com.example.deepakkv.keddit
 
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
-import android.widget.TextView
+import android.support.v7.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
-
-    private var mTextMessage: TextView? = null
-
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                mTextMessage!!.setText(R.string.title_home)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dashboard -> {
-                mTextMessage!!.setText(R.string.title_dashboard)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_notifications -> {
-                mTextMessage!!.setText(R.string.title_notifications)
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mTextMessage = findViewById(R.id.message) as TextView
-        val navigation = findViewById(R.id.navigation) as BottomNavigationView
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        setSupportActionBar(toolbar)
+    }
+
+    fun changeFragment(fragment: Fragment, cleanStack: Boolean = false) {
+        val fragmentManager = supportFragmentManager.beginTransaction()
+        if (cleanStack) {
+            clearBackStack()
+        }
+        fragmentManager.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out, R.anim.abc_popup_enter, R.anim.abc_popup_exit)
+        fragmentManager.replace(R.id.activity_base_content, fragment)
+        fragmentManager.addToBackStack(null)
+        fragmentManager.commit()
+    }
+
+    fun clearBackStack() {
+        val manager = supportFragmentManager
+        if (manager.backStackEntryCount > 0) {
+            val first = manager.getBackStackEntryAt(0)
+            manager.popBackStack(first.id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val manager = supportFragmentManager
+        if (manager.backStackEntryCount > 1) {
+            manager.popBackStack()
+        } else {
+            finish()
+        }
     }
 
 }
